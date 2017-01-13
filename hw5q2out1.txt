@@ -1,0 +1,7 @@
+Please enter the maze tiles.
+Example: (0,1),(1,2),(5,6),(2,3),(7,1)
+Please enter a source tile.
+Example: (5,6)
+Please enter a destination tile.
+Example: (8,3)
+5
