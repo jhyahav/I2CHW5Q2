@@ -17,6 +17,11 @@
 #define MAX_TWO_TUPLE_WITH_BRACKETS_LENGTH (MAX_NUMBER_LENGTH*2+3)
 
 /* FUNCTIONS */
+unsigned int RecursiveMazeSolver(int valid_tiles[N][N],
+                              unsigned int cur_row,
+                              unsigned int cur_col,
+                              unsigned int dest_row,
+                              unsigned int dest_col);
 /* -------------------------------------------------------- */
 
 
@@ -39,9 +44,19 @@ unsigned int find_path_length(int valid_tiles[N][N],
                               unsigned int dest_row,
                               unsigned int dest_col) {
     /* TODO: Implement this function */
+    int path_length = 0;
 
-    /* TODO: Change the following line to return the solution path length. */
-    return 0;
+    path_length = RecursiveMazeSolver(valid_tiles, source_row, source_col,
+                                      dest_row, dest_col);
+
+    /*for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%d ", valid_tiles[i][j]);
+        }
+        printf("\n");
+    }*/
+
+    return path_length;
 }
 
 
@@ -205,5 +220,73 @@ int main() {
     /* Print the returned solution path length. */
     printf("%u\n", path_length);
 
+    return 0;
+}
+
+unsigned int RecursiveMazeSolver(int valid_tiles[N][N],
+                              unsigned int cur_row,
+                              unsigned int cur_col,
+                              unsigned int dest_row,
+                              unsigned int dest_col) {
+    if (valid_tiles[cur_row][cur_col] == 0) {
+        return 0;
+    }
+
+    if (valid_tiles[cur_row][cur_col] == 2) {
+        return 0;
+    }
+
+    if (cur_row == dest_row && cur_col == dest_col) {
+        valid_tiles[cur_row][cur_col] = 2;
+        return 1;
+    }
+
+    valid_tiles[cur_row][cur_col] = 2;
+
+    if (cur_row < N - 1)
+    {
+        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row + 1,
+                                                cur_col, dest_row,
+                                                dest_col);
+
+        if (temp_name > 0) {
+            return temp_name + 1;
+        }
+    }
+
+    if (cur_col < N - 1)
+    {
+        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row,
+                                                cur_col + 1, dest_row,
+                                                dest_col);
+
+        if (temp_name > 0) {
+            return temp_name + 1;
+        }
+    }
+
+    if (cur_row > 0)
+    {
+        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row - 1,
+                                                cur_col, dest_row,
+                                                dest_col);
+
+        if (temp_name > 0) {
+            return temp_name + 1;
+        }
+    }
+
+    if (cur_col > 0)
+    {
+        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row,
+                                                cur_col - 1, dest_row,
+                                                dest_col);
+
+        if (temp_name > 0) {
+            return temp_name + 1;
+        }
+    }
+
+    valid_tiles[cur_row][cur_col] = 1;
     return 0;
 }
