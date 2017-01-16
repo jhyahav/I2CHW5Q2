@@ -182,7 +182,9 @@ int main() {
        Calculate the maximum length of the tiles string.
        (It is a function of n).
     */
-    max_tiles_string_length = N*(MAX_TWO_TUPLE_WITH_BRACKETS_LENGTH+1)-1;
+
+    ///Max length was originally N*..., changed to N*N*... to avoid crashes!
+    max_tiles_string_length = N*N*(MAX_TWO_TUPLE_WITH_BRACKETS_LENGTH+1)-1;
 
     /* Allocate memory of the tiles string.
        +1 for the terminating null character. */
