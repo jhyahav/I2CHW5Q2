@@ -18,15 +18,29 @@
 
 /* FUNCTIONS */
 unsigned int RecursiveMazeSolver(int valid_tiles[N][N],
-                              unsigned int cur_row,
-                              unsigned int cur_col,
-                              unsigned int dest_row,
-                              unsigned int dest_col);
+                                 unsigned int cur_row,
+                                 unsigned int cur_col,
+                                 unsigned int dest_row,
+                                 unsigned int dest_col);
+
+unsigned int RecursiveRowSolver(int valid_tiles[N][N],
+                                unsigned int cur_row,
+                                unsigned int cur_col,
+                                unsigned int dest_row,
+                                unsigned int dest_col);
+
+unsigned int RecursiveColSolver(int valid_tiles[N][N],
+                                unsigned int cur_row,
+                                unsigned int cur_col,
+                                unsigned int dest_row,
+                                unsigned int dest_col);
 /* -------------------------------------------------------- */
 
 
 /*
    find_path_length - Finds the length of a solution path in the maze.
+   This function is a wrapper function for the recursive function
+   RecursiveMazeSolver.
    Inputs: valid_tiles - a 2-dimensional array that contains
                     1 if the tile is a valid tile or 0 otherwise.
                     Note that the source and destination tiles
@@ -42,21 +56,167 @@ unsigned int find_path_length(int valid_tiles[N][N],
                               unsigned int source_row,
                               unsigned int source_col,
                               unsigned int dest_row,
-                              unsigned int dest_col) {
-    /* TODO: Implement this function */
+                              unsigned int dest_col)
+{
     int path_length = 0;
 
     path_length = RecursiveMazeSolver(valid_tiles, source_row, source_col,
                                       dest_row, dest_col);
 
-    /*for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%d ", valid_tiles[i][j]);
-        }
-        printf("\n");
-    }*/
-
     return path_length;
+}
+
+/*
+RecursiveMazeSolver - Uses backtracking to find a solution path in the
+maze. While computing a path, the function also counts the number of tiles
+traversed when that path is taken.
+   Inputs: valid_tiles - a 2-dimensional array that contains
+                    1 if the tile is a valid tile or 0 otherwise.
+                    Note that the source and destination tiles
+                    are defined as valid tiles.
+           cur_row, cur_col - row and column position (0 based)
+                    of the current tile (the source tile when the function
+                    is first called).
+           dest_row, dest_col - row and column position (0 based)
+                    of the destination tile.
+    Returns - Length of a solution path, or 0 if there is no solution
+              path.
+*/
+
+unsigned int RecursiveMazeSolver(int valid_tiles[N][N],
+                                 unsigned int cur_row,
+                                 unsigned int cur_col,
+                                 unsigned int dest_row,
+                                 unsigned int dest_col)
+{
+    if (valid_tiles[cur_row][cur_col] == 0)
+    {
+        return 0;
+    }
+
+    if (valid_tiles[cur_row][cur_col] == 2)
+    {
+        return 0;
+    }
+
+    if (cur_row == dest_row && cur_col == dest_col)
+    {
+        valid_tiles[cur_row][cur_col] = 2;
+        return 1;
+    }
+
+    valid_tiles[cur_row][cur_col] = 2;
+
+    int rows_return = RecursiveRowSolver(valid_tiles, cur_row, cur_col,
+                                         dest_row, dest_col);
+
+    if (rows_return)
+    {
+        return rows_return;
+    }
+
+    int columns_return = RecursiveColSolver(valid_tiles, cur_row, cur_col,
+                                            dest_row, dest_col);
+
+    if (columns_return)
+    {
+        return columns_return;
+    }
+
+    valid_tiles[cur_row][cur_col] = 1;
+
+    return 0;
+}
+
+/*RecursiveRowSolver - This function checks solutions for moving down or
+up (incrementing or decrementing cur_row). The function, applying the
+principle of mutual recursion, calls RecursiveMazeSolver.
+   Inputs: valid_tiles - a 2-dimensional array that contains
+                    1 if the tile is a valid tile or 0 otherwise.
+                    Note that the source and destination tiles
+                    are defined as valid tiles.
+           cur_row, cur_col - row and column position (0 based)
+                    of the current tile (the source tile when the function
+                    is first called).
+           dest_row, dest_col - row and column position (0 based)
+                    of the destination tile.
+    Returns - Length of the solution path so far (0 if there is no solution
+                path).*/
+unsigned int RecursiveRowSolver(int valid_tiles[N][N],
+                                unsigned int cur_row,
+                                unsigned int cur_col,
+                                unsigned int dest_row,
+                                unsigned int dest_col)
+{
+    if (cur_row < N - 1)
+    {
+        int next_step_return = RecursiveMazeSolver(valid_tiles,cur_row + 1,
+                               cur_col, dest_row, dest_col);
+
+        if (next_step_return > 0)
+        {
+            return next_step_return + 1;
+        }
+    }
+
+    if (cur_row > 0)
+    {
+        int next_step_return = RecursiveMazeSolver(valid_tiles,
+                               cur_row - 1, cur_col, dest_row, dest_col);
+
+        if (next_step_return > 0)
+        {
+            return next_step_return + 1;
+        }
+    }
+
+    return 0;
+}
+
+/*RecursiveColSolver - This function checks solutions for moving right or
+left (incrementing or decrementing cur_col). The function, applying the
+principle of mutual recursion, calls RecursiveMazeSolver.
+   Inputs: valid_tiles - a 2-dimensional array that contains
+                    1 if the tile is a valid tile or 0 otherwise.
+                    Note that the source and destination tiles
+                    are defined as valid tiles.
+           cur_row, cur_col - row and column position (0 based)
+                    of the current tile (the source tile when the function
+                    is first called).
+           dest_row, dest_col - row and column position (0 based)
+                    of the destination tile.
+    Returns - Length of the solution path so far (0 if there is no solution
+                path).*/
+unsigned int RecursiveColSolver(int valid_tiles[N][N],
+                                unsigned int cur_row,
+                                unsigned int cur_col,
+                                unsigned int dest_row,
+                                unsigned int dest_col)
+{
+    if (cur_col < N - 1)
+    {
+        int next_step_return = RecursiveMazeSolver(valid_tiles, cur_row,
+                               cur_col + 1, dest_row, dest_col);
+
+        if (next_step_return > 0)
+        {
+            return next_step_return + 1;
+        }
+    }
+
+
+    if (cur_col > 0)
+    {
+        int next_step_return = RecursiveMazeSolver(valid_tiles, cur_row,
+                               cur_col - 1, dest_row, dest_col);
+
+        if (next_step_return > 0)
+        {
+            return next_step_return + 1;
+        }
+    }
+
+    return 0;
 }
 
 
@@ -68,21 +228,24 @@ unsigned int find_path_length(int valid_tiles[N][N],
    Inputs: tiles - the tiles string.
    Returns true if and only if the function gets the input successfully.
 */
-bool get_tiles_string(char* tiles) {
+bool get_tiles_string(char* tiles)
+{
     printf("Please enter the maze tiles.\n");
     printf("Example: (0,1),(1,2),(5,6),(2,3),(7,1)\n");
     return (scanf("%s", tiles) == 1);
 }
 
 
-bool get_source(char* source) {
+bool get_source(char* source)
+{
     printf("Please enter a source tile.\n");
     printf("Example: (5,6)\n");
     return (scanf("%s", source) == 1);
 }
 
 
-bool get_destination(char* source) {
+bool get_destination(char* source)
+{
     printf("Please enter a destination tile.\n");
     printf("Example: (8,3)\n");
     return (scanf("%s", source) == 1);
@@ -100,25 +263,30 @@ bool valid_tile(char* s)
    validate_input - Validates program input.
    Returns true if and only if the input is valid.
 */
-bool validate_input(char* tiles, char* source, char* destination) {
-    if (!valid_tile(source)) {
+bool validate_input(char* tiles, char* source, char* destination)
+{
+    if (!valid_tile(source))
+    {
         printf("Note: the source tile is invalid\n");
         return false;
     }
-    if (!valid_tile(destination)) {
+    if (!valid_tile(destination))
+    {
         printf("Note: the destination tile is invalid\n");
         return false;
     }
     while (*tiles != '\0')
     {
-        if (!valid_tile(tiles)) {
+        if (!valid_tile(tiles))
+        {
             printf("Note: the maze tiles string contains an invalid tile.\n");
             return false;
         }
         while (*tiles != ')')
             ++tiles;
         ++tiles;
-        if ((*tiles != ',') && (*tiles != '\0')) {
+        if ((*tiles != ',') && (*tiles != '\0'))
+        {
             printf("Note: the maze tiles string contains an invalid separator (non comma).\n");
             return false;
         }
@@ -132,7 +300,8 @@ bool validate_input(char* tiles, char* source, char* destination) {
 
 void get_tile_position(char* tile,
                        unsigned int* row_ptr,
-                       unsigned int* col_ptr) {
+                       unsigned int* col_ptr)
+{
     sscanf(tile, "(%u,%u)", row_ptr, col_ptr);
 }
 
@@ -141,7 +310,8 @@ void get_tile_position(char* tile,
 void fill_valid_tiles_array(char* tiles,
                             char* source,
                             char* destination,
-                            int valid_tiles[N][N]) {
+                            int valid_tiles[N][N])
+{
     unsigned int row, column;
     get_tile_position(source, &row, &column);
     valid_tiles[row][column]=1;
@@ -166,7 +336,8 @@ void fill_valid_tiles_array(char* tiles,
    Returns 0 when the program run successfully.
    Any other value indicates an error.
 */
-int main() {
+int main()
+{
     unsigned int max_tiles_string_length;
     char* tiles = NULL;
     char source[MAX_TWO_TUPLE_WITH_BRACKETS_LENGTH+1] = { '\0' };
@@ -183,13 +354,13 @@ int main() {
        (It is a function of n).
     */
 
-    ///Max length was originally N*..., changed to N*N*... to avoid crashes!
     max_tiles_string_length = N*N*(MAX_TWO_TUPLE_WITH_BRACKETS_LENGTH+1)-1;
 
     /* Allocate memory of the tiles string.
        +1 for the terminating null character. */
     tiles = (char*)malloc(max_tiles_string_length+1);
-    if (NULL == tiles) {
+    if (NULL == tiles)
+    {
         printf("Memory allocation error\n");
         return 1;
     }
@@ -203,7 +374,8 @@ int main() {
     if (!get_destination(destination))
         return 1;
 
-    if (!validate_input(tiles, source, destination)) {
+    if (!validate_input(tiles, source, destination))
+    {
         printf("ERROR: invalid input\n");
         return 2;
     }
@@ -222,73 +394,5 @@ int main() {
     /* Print the returned solution path length. */
     printf("%u\n", path_length);
 
-    return 0;
-}
-
-unsigned int RecursiveMazeSolver(int valid_tiles[N][N],
-                              unsigned int cur_row,
-                              unsigned int cur_col,
-                              unsigned int dest_row,
-                              unsigned int dest_col) {
-    if (valid_tiles[cur_row][cur_col] == 0) {
-        return 0;
-    }
-
-    if (valid_tiles[cur_row][cur_col] == 2) {
-        return 0;
-    }
-
-    if (cur_row == dest_row && cur_col == dest_col) {
-        valid_tiles[cur_row][cur_col] = 2;
-        return 1;
-    }
-
-    valid_tiles[cur_row][cur_col] = 2;
-
-    if (cur_row < N - 1)
-    {
-        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row + 1,
-                                                cur_col, dest_row,
-                                                dest_col);
-
-        if (temp_name > 0) {
-            return temp_name + 1;
-        }
-    }
-
-    if (cur_col < N - 1)
-    {
-        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row,
-                                                cur_col + 1, dest_row,
-                                                dest_col);
-
-        if (temp_name > 0) {
-            return temp_name + 1;
-        }
-    }
-
-    if (cur_row > 0)
-    {
-        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row - 1,
-                                                cur_col, dest_row,
-                                                dest_col);
-
-        if (temp_name > 0) {
-            return temp_name + 1;
-        }
-    }
-
-    if (cur_col > 0)
-    {
-        int temp_name = RecursiveMazeSolver(valid_tiles, cur_row,
-                                                cur_col - 1, dest_row,
-                                                dest_col);
-
-        if (temp_name > 0) {
-            return temp_name + 1;
-        }
-    }
-
-    valid_tiles[cur_row][cur_col] = 1;
     return 0;
 }
